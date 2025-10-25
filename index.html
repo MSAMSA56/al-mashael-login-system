@@ -10,24 +10,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b1220;
-      --card: #111a2b;
-      --muted: #94a3b8;
-      --text: #e2e8f0;
-      --primary: #22c55e;
-      --primary-600: #16a34a;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --ring: rgba(34,197,94,.35);
-      --input: #1f2a44;
-      --shadow: 0 20px 45px rgba(2,6,23,.35);
+      --bg: #0b1220; --card: #111a2b; --muted:#94a3b8; --text:#e2e8f0;
+      --primary:#22c55e; --primary-600:#16a34a; --danger:#ef4444; --warning:#f59e0b;
+      --ring: rgba(34,197,94,.35); --input:#1f2a44; --shadow: 0 20px 45px rgba(2,6,23,.35);
     }
-    @media (prefers-color-scheme: light) {
-      :root{
-        --bg:#f6f7fb; --card:#fff; --muted:#475569; --text:#0f172a;
-        --primary:#16a34a; --primary-600:#15803d; --danger:#dc2626; --warning:#d97706;
-        --ring: rgba(22,163,74,.25); --input:#f1f5f9; --shadow: 0 18px 36px rgba(15,23,42,.12);
-      }
+    [data-theme="light"] {
+      --bg:#f6f7fb; --card:#fff; --muted:#475569; --text:#0f172a;
+      --primary:#16a34a; --primary-600:#15803d; --danger:#dc2626; --warning:#d97706;
+      --ring: rgba(22,163,74,.25); --input:#f1f5f9; --shadow: 0 18px 36px rgba(15,23,42,.12);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -49,15 +39,9 @@
     }
     .hero h1{margin:0; font-size:28px; line-height:1.2; letter-spacing:.2px}
     .hero p{margin:0; color:var(--muted)}
-    .stat{display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; padding:12px 14px; border-radius:12px;
-      background: color-mix(in oklab, var(--card), transparent 6%);
-      border:1px dashed color-mix(in oklab, var(--text), transparent 85%);
-    }
-    .stat .dot{width:10px; height:10px; border-radius:50%; background:var(--primary)}
     .kpis{display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:auto}
     .kpi{padding:14px; border-radius:12px; background: color-mix(in oklab, var(--card), transparent 6%);
-      border:1px solid color-mix(in oklab, var(--text), transparent 88%);
-    }
+      border:1px solid color-mix(in oklab, var(--text), transparent 88%);}
     .kpi h3{margin:0 0 4px; font-size:13px; color:var(--muted)} .kpi .v{font-weight:700}
     .form{padding:28px; display:grid; gap:18px}
     .brand{display:flex; align-items:center; gap:10px}
@@ -87,16 +71,12 @@
     .divider{height:1px; background: color-mix(in oklab, var(--text), transparent 90%)}
     .lang{display:inline-flex; gap:6px; align-items:center}
   </style>
-  <!-- Firebase SDKs -->
-  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <div class="app">
+  <div class="app" id="appRoot">
     <section class="card hero">
       <h1 id="t-title">مرحبا بك في نظام المشاعل</h1>
-      <p id="t-sub">تسجيل دخول آمن مع Firebase ودعم وضع داكن مريح.</p>
+      <p id="t-sub">تسجيل دخول آمن مع دعم الوضع الداكن.</p>
       <div class="kpis">
         <div class="kpi"><h3 id="t-speed">السرعة</h3><div class="v">+99%</div></div>
         <div class="kpi"><h3 id="t-security">الحماية</h3><div class="v">مُعززة</div></div>
@@ -110,25 +90,35 @@
         <h2 id="t-brand">نظام تسجيل الدخول</h2>
         <div class="toggle">
           <span class="lang"><span id="t-ar">عربي</span>/<span id="t-en">English</span></span>
-          <input id="langSwitch" class="switch" type="checkbox" aria-label="تبديل اللغة">
+          <input aria-label="تبديل اللغة" class="switch" id="langSwitch" type="checkbox" />
+          <span style="width:8px"></span>
+          <span id="t-theme">الوضع</span>
+          <input aria-label="تبديل الوضع" class="switch" id="themeSwitch" type="checkbox" />
         </div>
       </div>
 
       <div class="row">
         <div class="field">
-          <label id="t-email-label" for="email">البريد الإلكتروني</label>
-          <input id="email" type="email" placeholder="example@mail.com" autocomplete="email">
+          <label for="email" id="t-email-label">البريد الإلكتروني</label>
+          <input autocomplete="email" id="email" placeholder="example@mail.com" type="email" />
         </div>
         <div class="field">
-          <label id="t-pass-label" for="password">كلمة المرور</label>
-          <input id="password" type="password" placeholder="********" autocomplete="current-password">
+          <label for="password" id="t-pass-label">كلمة المرور</label>
+          <input autocomplete="current-password" id="password" placeholder="********" type="password" />
+          <div class="hint" id="passHint">English letters/digits only. No spaces or Arabic.</div>
         </div>
       </div>
 
-      <button id="loginBtn" class="primary">تسجيل الدخول</button>
+      <div class="row">
+        <button class="primary" id="loginBtn">تسجيل الدخول</button>
+        <button class="primary" id="createBtn" style="background:#10b981; color:#052e16">إنشاء حساب</button>
+      </div>
+
       <div class="links">
-        <button id="googleBtn" class="primary" style="background:#3b82f6; color:#fff">Google</button>
-        <button id="logoutBtn" class="primary" style="background:#ef4444; color:#fff; display:none">تسجيل الخروج</button>
+        <button class="primary" id="googleBtn" style="background:#3b82f6; color:#fff">Google</button>
+        <button class="primary" id="facebookBtn" style="background:#2563eb; color:#fff">Facebook</button>
+        <button class="primary" id="appleBtn" style="background:#0f172a; color:#fff">Apple</button>
+        <button class="primary" id="twitterBtn" style="background:#1d9bf0; color:#fff">Twitter/X</button>
       </div>
 
       <div class="divider"></div>
@@ -141,121 +131,120 @@
     const STR = {
       ar: {
         title: "مرحبا بك في نظام المشاعل",
-        sub: "تسجيل دخول آمن مع Firebase ودعم وضع داكن مريح.",
+        sub: "تسجيل دخول آمن مع دعم الوضع الداكن.",
         brand: "نظام تسجيل الدخول",
+        theme: "الوضع",
         email: "البريد الإلكتروني",
         pass: "كلمة المرور",
         speed: "السرعة",
         security: "الحماية",
         ux: "التجربة",
         login: "تسجيل الدخول",
-        logout: "تسجيل الخروج",
-        ready: "جاهز"
+        create: "إنشاء حساب",
+        ready: "جاهز",
+        invalidPass: "كلمة المرور إنجليزية فقط، بدون مسافات أو أحرف عربية",
+        signedWith: (p)=>`تم التوقيع عبر ${p}`
       },
       en: {
         title: "Welcome to Al-Mashael System",
-        sub: "Secure login with Firebase and eye-friendly dark mode.",
+        sub: "Secure login with dark mode support.",
         brand: "Login System",
+        theme: "Theme",
         email: "Email",
         pass: "Password",
         speed: "Speed",
         security: "Security",
         ux: "Experience",
         login: "Log in",
-        logout: "Log out",
-        ready: "Ready"
+        create: "Create account",
+        ready: "Ready",
+        invalidPass: "Password must be English only, no spaces or Arabic",
+        signedWith: (p)=>`Signed in with ${p}`
       }
     };
 
     const $ = s => document.querySelector(s);
+    const html = document.documentElement;
+
+    // Theme toggle (persistent)
+    const themeSwitch = $('#themeSwitch');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    function applyTheme(theme){
+      if(theme === 'light'){ html.setAttribute('data-theme', 'light'); }
+      else { html.removeAttribute('data-theme'); }
+      localStorage.setItem('theme', theme);
+      themeSwitch.checked = (theme === 'light');
+    }
+    themeSwitch.addEventListener('change', ()=>applyTheme(themeSwitch.checked ? 'light' : 'dark'));
+    applyTheme(savedTheme);
+
+    // Language toggle (persistent RTL/LTR)
     const langSwitch = $('#langSwitch');
     let lang = localStorage.getItem('lang') || 'ar';
-
     function applyLang() {
       const t = STR[lang];
       $('#t-title').textContent = t.title;
       $('#t-sub').textContent = t.sub;
       $('#t-brand').textContent = t.brand;
+      $('#t-theme').textContent = t.theme;
       $('#t-email-label').textContent = t.email;
       $('#t-pass-label').textContent = t.pass;
       $('#t-speed').textContent = t.speed;
       $('#t-security').textContent = t.security;
       $('#t-ux').textContent = t.ux;
       $('#loginBtn').textContent = t.login;
-      $('#logoutBtn').textContent = t.logout;
+      $('#createBtn').textContent = t.create;
       $('#status').textContent = t.ready;
       document.documentElement.lang = lang;
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
       langSwitch.checked = (lang === 'en');
     }
-
     langSwitch.addEventListener('change', () => {
       lang = langSwitch.checked ? 'en' : 'ar';
       localStorage.setItem('lang', lang);
       applyLang();
     });
-
     applyLang();
 
-    // Firebase init (Replace with your config)
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      appId: "YOUR_APP_ID"
-    };
-
-    function safeInit() {
-      try {
-        if (firebase?.apps?.length === 0) firebase.initializeApp(firebaseConfig);
-      } catch(e) { console.warn('Firebase init skipped', e); }
-    }
-
+    // Remove Firebase completely: No SDKs, no API keys, no auth calls
+    // Simulate social logins for demo purposes only
     function setStatus(msg){ $('#status').textContent = msg; }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      safeInit();
-      const auth = firebase?.auth?.();
+    // Password validation: English only (ASCII letters/numbers/symbols), no spaces, no Arabic
+    function isValidPassword(pw){
+      if(!pw) return false;
+      if(/\s/.test(pw)) return false;           // no spaces
+      if(/[\u0600-\u06FF]/.test(pw)) return false; // no Arabic block
+      // allow only ASCII printable characters
+      return /^[\x21-\x7E]+$/.test(pw);
+    }
 
-      $('#loginBtn').addEventListener('click', async () => {
-        const email = $('#email').value.trim();
-        const pass = $('#password').value;
-        if(!email || !pass) return setStatus(lang==='ar' ? 'الرجاء إدخال البيانات' : 'Please enter credentials');
-        try {
-          if(!auth) throw new Error('Auth not ready');
-          await auth.signInWithEmailAndPassword(email, pass);
-          setStatus(lang==='ar' ? 'تم تسجيل الدخول' : 'Logged in');
-          $('#logoutBtn').style.display = '';
-        } catch(err){
-          console.error(err);
-          setStatus((lang==='ar'? 'خطأ: ' : 'Error: ') + (err.message||''));
-        }
-      });
+    function handleLoginLike(action){
+      const email = $('#email').value.trim();
+      const pass = $('#password').value;
+      if(!email || !pass){
+        return setStatus(lang==='ar'? 'الرجاء إدخال البيانات' : 'Please enter credentials');
+      }
+      if(!isValidPassword(pass)){
+        return setStatus(STR[lang].invalidPass);
+      }
+      // Demo success
+      setStatus(lang==='ar' ? `تمت العملية: ${action}` : `Success: ${action}`);
+    }
 
-      $('#googleBtn').addEventListener('click', async () => {
-        try{
-          if(!auth) throw new Error('Auth not ready');
-          const provider = new firebase.auth.GoogleAuthProvider();
-          await auth.signInWithPopup(provider);
-          setStatus(lang==='ar' ? 'تم تسجيل الدخول عبر Google' : 'Signed in with Google');
-          $('#logoutBtn').style.display = '';
-        }catch(err){
-          console.error(err);
-          setStatus((lang==='ar'? 'خطأ: ' : 'Error: ') + (err.message||''));
-        }
-      });
+    $('#loginBtn').addEventListener('click', ()=>handleLoginLike('تسجيل دخول'));
+    $('#createBtn').addEventListener('click', ()=>handleLoginLike('إنشاء حساب'));
 
-      $('#logoutBtn').addEventListener('click', async () => {
-        try{
-          if(!auth) throw new Error('Auth not ready');
-          await auth.signOut();
-          setStatus(lang==='ar' ? 'تم تسجيل الخروج' : 'Logged out');
-          $('#logoutBtn').style.display = 'none';
-        }catch(err){
-          console.error(err);
-          setStatus((lang==='ar'? 'خطأ: ' : 'Error: ') + (err.message||''));
-        }
-      });
+    // Social buttons (mock success without Firebase)
+    const socials = [
+      { id:'googleBtn', label:'Google' },
+      { id:'facebookBtn', label:'Facebook' },
+      { id:'appleBtn', label:'Apple' },
+      { id:'twitterBtn', label:'Twitter/X' }
+    ];
+    socials.forEach(s=>{
+      const el = document.getElementById(s.id);
+      if(el) el.addEventListener('click', ()=> setStatus(STR[lang].signedWith(s.label)));
     });
   </script>
 </body>
