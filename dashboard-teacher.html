@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة المعلم - المشاعل</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:Cairo,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#0b1220;color:#eef2ff}
+    header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#0f172a;position:sticky;top:0;border-bottom:1px solid #233054}
+    header .brand{font-weight:800;letter-spacing:.4px}
+    header nav a{color:#9fb4ff;margin-inline:8px;text-decoration:none}
+    .container{max-width:1100px;margin:22px auto;padding:0 16px}
+    .card{background:#111a33;border:1px solid #263458;border-radius:14px;padding:16px;margin-bottom:16px}
+    .grid{display:grid;gap:14px}
+    @media(min-width:900px){.grid{grid-template-columns:1.2fr .8fr}}
+    input,select,button,textarea{background:#0f1a34;color:#eaf0ff;border:1px solid #2a3c64;border-radius:10px;padding:10px 12px}
+    button{cursor:pointer;background:#3757ff;border-color:#4a66ff}
+    button.secondary{background:#132146}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #233054}
+    .muted{color:#a8b3d6}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;background:#132146;color:#9fb4ff;border:1px solid #233054}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .flex{display:flex;align-items:center;gap:8px}
+    .right{margin-inline-start:auto}
+    .ok{color:#22c55e}.warn{color:#f59e0b}.err{color:#ef4444}
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">المشاعل • لوحة المعلم</div>
+    <nav>
+      <a href="index.html">تسجيل الخروج</a>
+      <a href="dashboard-student.html">لوحة الطالب</a>
+      <a href="dashboard-admin.html">لوحة المدير</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <section class="card">
+        <h2>حصصي اليوم</h2>
+        <div class="row">
+          <select id="gradeSelect">
+            <option value="">اختر الصف</option>
+          </select>
+          <select id="classSelect">
+            <option value="">اختر الشعبة</option>
+          </select>
+          <button id="loadSchedule">تحميل الجدول</button>
+          <span class="right pill" id="teacherName">—</span>
+        </div>
+        <table>
+          <thead>
+            <tr><th>المادة</th><th>الصف/الشعبة</th><th>الحصة</th><th>الوقت</th><th>الغرفة</th></tr>
+          </thead>
+          <tbody id="scheduleBody"></tbody>
+        </table>
+      </section>
+
+      <aside class="card">
+        <h2>إدخال الدرجات</h2>
+        <div class="row">
+          <input id="studentId" placeholder="رقم الطالب" />
+          <input id="subject" placeholder="المادة" />
+          <input id="score" placeholder="الدرجة" type="number" min="0" max="100" />
+          <button id="saveScore">حفظ</button>
+        </div>
+        <p class="muted">سيتم حفظ الدرجات في مجموعة grades لكل طالب.</p>
+      </aside>
+    </div>
+
+    <section class="card">
+      <h2>سجل الدرجات الأخيرة</h2>
+      <table>
+        <thead><tr><th>الطالب</th><th>المادة</th><th>الدرجة</th><th>تاريخ</th></tr></thead>
+        <tbody id="recentGrades"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    const firebaseConfig = { apiKey:"", authDomain:"", projectId:"", appId:"" };
+    let app, db, auth;
+    try { app = firebase.initializeApp(firebaseConfig); db = firebase.firestore(); auth = firebase.auth(); }
+    catch(e){ console.warn('Firebase لم يُهيأ بعد.'); }
+
+    async function populateGradeClass(){
+      if(!db) return;
+      const gradeSel = document.getElementById('gradeSelect');
+      gradeSel.innerHTML = '<option value="">اختر الصف</option>';
+      const gradesSnap = await db.collection('gradesMeta').get();
+      gradesSnap.forEach(g=>{ const opt=document.createElement('option'); opt.value=g.id; opt.textContent=g.data().name||g.id; gradeSel.appendChild(opt); });
+      document.getElementById('classSelect').innerHTML = '<option value="">اختر الشعبة</option>';
+    }
+
+    document.getElementById('gradeSelect').addEventListener('change', async (e)=>{
+      const gradeId = e.target.value; const classSel = document.getElementById('classSelect');
+      classSel.innerHTML = '<option value="">اختر الشعبة</option>';
+      if(!db||!gradeId) return;
+      const classes = await db.collection('gradesMeta').doc(gradeId).collection('classes').get();
+      classes.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.id; opt.textContent=c.data().name||c.id; classSel.appendChild(opt); });
+    });
+
+    document.getElementById('loadSchedule').addEventListener('click', async ()=>{
+      const gradeId=document.getElementById('gradeSelect').value;
+      const classId=document.getElementById('classSelect').value;
+      const tbody=document.getElementById('scheduleBody'); tbody.innerHTML='';
+      if(!db||!gradeId||!classId) return;
+      const teacherUid = auth?.currentUser?.uid || 'demo-teacher';
+      document.getElementById('teacherName').textContent = teacherUid;
+      const q = await db.collection('schedules')
+        .where('gradeId','==',gradeId).where('classId','==',classId).where('teacherId','==',teacherUid).get();
+      q.forEach(doc=>{ const s=doc.data(); const tr=document.createElement('tr');
+        tr.innerHTML = `<td>${s.subject||''}</td><td>${s.gradeId}/${s.classId}</td><td>${s.period||''}</td><td>${s.time||''}</td><td>${s.room||''}</td>`; tbody.appendChild(tr); });
+    });
+
+    document.getElementById('saveScore').addEventListener('click', async ()=>{
+      const studentId=document.getElementById('studentId').value.trim();
+      const subject=document.getElementById('subject').value.trim();
+      const score=Number(document.getElementById('score').value);
+      if(!db||!studentId||!subject||Number.isNaN(score)) return alert('أكمل الحقول');
+      await db.collection('students').doc(studentId).collection('grades').add({ subject, score, createdAt:new Date(), teacherId:auth?.currentUser?.uid||'demo-teacher' });
+      document.getElementById('studentId').value=''; document.getElementById('subject').value=''; document.getElementById('score').value='';
+      loadRecentGrades();
+    });
+
+    async function loadRecentGrades(){
+      const tbody=document.getElementById('recentGrades'); tbody.innerHTML=''; if(!db) return;
+      const q=await db.collectionGroup('grades').orderBy('createdAt','desc').limit(10).get();
+      q.forEach(doc=>{ const g=doc.data(); const tr=document.createElement('tr');
+        const dt=g.createdAt?.toDate?g.createdAt.toDate():g.createdAt;
+        tr.innerHTML = `<td>${g.studentId||doc.ref.parent.parent?.id||''}</td><td>${g.subject||''}</td><td>${g.score||''}</td><td>${dt? new Date(dt).toLocaleString('ar-EG'):''}</td>`; tbody.appendChild(tr); });
+    }
+
+    populateGradeClass(); loadRecentGrades();
+  </script>
+</body>
+</html>
