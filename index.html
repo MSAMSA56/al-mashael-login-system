@@ -4,145 +4,259 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>نظام تسجيل الدخول - المشاعل</title>
-  <meta name="color-scheme" content="light dark">
+  <meta name="color-scheme" content="light dark" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --bg:#0b1220; --card:#111a2b; --muted:#94a3b8; --text:#e2e8f0; --primary:#22c55e; --primary-600:#16a34a; --danger:#ef4444; --warning:#f59e0b; --ring:rgba(34,197,94,.35); --input:#1f2a44; --shadow:0 20px 45px rgba(2,6,23,.35) }
-    @media (prefers-color-scheme: light) { :root { --bg:#f6f7fb; --card:#ffffff; --muted:#475569; --text:#0f172a; --primary:#16a34a; --primary-600:#15803d; --danger:#dc2626; --warning:#d97706; --ring:rgba(22,163,74,.25); --input:#f1f5f9; --shadow:0 18px 36px rgba(15,23,42,.12) } }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;font-family:"Cairo",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(1200px 500px at 90% -10%, rgba(34,197,94,.08), transparent 60%), radial-gradient(900px 500px at -10% 110%, rgba(59,130,246,.08), transparent 60%), var(--bg);color:var(--text);display:grid;place-items:center;padding:24px}
-    .app{width:100%;max-width:940px;display:grid;gap:24px;grid-template-columns:1.1fr 1fr;align-items:stretch}
-    @media (max-width:860px){.app{grid-template-columns:1fr}}
-    .card{background:linear-gradient(180deg,color-mix(in oklab,var(--card),transparent 8%),var(--card));border:1px solid color-mix(in oklab,var(--text),transparent 88%);border-radius:16px;box-shadow:var(--shadow);overflow:clip}
-    .hero{position:relative;padding:28px;display:grid;gap:16px;min-height:460px;background:radial-gradient(800px 300px at 100% 0%, rgba(34,197,94,.08), transparent 60%), radial-gradient(700px 260px at 0% 100%, rgba(59,130,246,.08), transparent 60%)}
-    .hero h1{margin:0;font-size:28px;line-height:1.2;letter-spacing:.2px}
-    .hero p{margin:0;color:var(--muted)}
-    .stat{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:color-mix(in oklab,var(--card),transparent 6%);border:1px dashed color-mix(in oklab,var(--text),transparent 85%)}
-    .stat .dot{width:10px;height:10px;border-radius:50%;background:var(--primary)}
-    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:auto}
-    .kpi{padding:14px;border-radius:12px;background:color-mix(in oklab,var(--card),transparent 6%);border:1px solid color-mix(in oklab,var(--text),transparent 88%)}
-    .kpi h3{margin:0 0 4px;font-size:13px;color:var(--muted)} .kpi .v{font-weight:700}
-    .form{padding:28px;display:grid;gap:18px}
-    .brand{display:flex;align-items:center;gap:10px}
-    .logo{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(135deg,var(--primary),#2dd4bf)}
-    .brand h2{margin:0;font-size:20px}
-    .toggle{margin-inline-start:auto;display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
-    .switch{appearance:none;width:46px;height:26px;background:var(--input);border-radius:999px;position:relative;outline:none;cursor:pointer;border:1px solid color-mix(in oklab,var(--text),transparent 85%)}
-    .switch:before{content:"";position:absolute;inset:3px auto 3px 3px;width:20px;border-radius:999px;background:#fff;transition:transform .25s ease}
-    .switch:checked{background:color-mix(in oklab,var(--primary),black 15%)}
-    .switch:checked:before{transform:translateX(-20px)}
-    .field{display:grid;gap:8px} label{font-weight:600}
-    .input{appearance:none;border:1px solid color-mix(in oklab,var(--text),transparent 85%);background:var(--input);color:var(--text);border-radius:12px;padding:12px 14px;outline:2px solid transparent;outline-offset:2px;transition:box-shadow .15s ease,border-color .15s ease}
-    .input:focus{border-color:var(--primary);box-shadow:0 0 0 6px var(--ring)}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .actions{display:grid;gap:10px}
-    .btn{cursor:pointer;appearance:none;border:none;padding:12px 14px;border-radius:12px;font-weight:700;display:inline-flex;justify-content:center;align-items:center;gap:10px}
-    .btn.primary{background:var(--primary);color:#051108}
-    .btn.primary:hover{background:var(--primary-600)}
-    .btn.ghost{background:transparent;color:var(--text);border:1px solid color-mix(in oklab,var(--text),transparent 85%)}
-    .links{display:flex;justify-content:space-between;font-size:13px}
-    a{color:color-mix(in oklab,var(--primary),white 20%);text-decoration:none} a:hover{text-decoration:underline}
-    .alert{display:none;padding:12px 14px;border-radius:12px;border:1px solid;font-weight:600}
-    .alert.danger{display:none;background:color-mix(in oklab,var(--danger),black 90%);border-color:color-mix(in oklab,var(--danger),white 70%);color:color-mix(in oklab,var(--danger),white 80%)}
-    .alert.warning{display:none;background:color-mix(in oklab,var(--warning),black 90%);border-color:color-mix(in oklab,var(--warning),white 70%);color:color-mix(in oklab,var(--warning),white 80%)}
-    .toast{position:fixed;inset-inline-end:18px;inset-block-end:18px;z-index:50;display:grid;gap:10px;min-width:280px;max-width:92vw}
-    .toast .item{display:grid;grid-template-columns:auto 1fr auto;align-items:start;gap:10px;padding:12px 14px;border-radius:12px;border:1px solid color-mix(in oklab,var(--text),transparent 86%);background:var(--card);box-shadow:var(--shadow)}
-    .toast .item .title{font-weight:700}
-    .toast .item.success{border-color:color-mix(in oklab,var(--primary),white 70%)}
-    .toast .close{cursor:pointer;background:transparent;border:none;color:var(--muted);font-weight:700}
-    footer{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}
+    :root {
+      --bg: #0b1220;
+      --card: #111a2b;
+      --muted: #94a3b8;
+      --text: #e2e8f0;
+      --primary: #22c55e;
+      --primary-600: #16a34a;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --ring: rgba(34,197,94,.35);
+      --input: #1f2a44;
+      --shadow: 0 20px 45px rgba(2,6,23,.35);
+    }
+    @media (prefers-color-scheme: light) {
+      :root{
+        --bg:#f6f7fb; --card:#fff; --muted:#475569; --text:#0f172a;
+        --primary:#16a34a; --primary-600:#15803d; --danger:#dc2626; --warning:#d97706;
+        --ring: rgba(22,163,74,.25); --input:#f1f5f9; --shadow: 0 18px 36px rgba(15,23,42,.12);
+      }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:"Cairo", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 500px at 90% -10%, rgba(34,197,94,.08), transparent 60%),
+                  radial-gradient(900px 500px at -10% 110%, rgba(59,130,246,.08), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+      display:grid; place-items:center; padding:24px;
+    }
+    .app{width:100%; max-width:980px; display:grid; gap:24px; grid-template-columns:1.1fr 1fr; align-items:stretch}
+    @media (max-width: 860px){.app{grid-template-columns:1fr}}
+    .card{background: linear-gradient(180deg, color-mix(in oklab, var(--card), transparent 8%), var(--card));
+      border:1px solid color-mix(in oklab, var(--text), transparent 88%); border-radius:16px; box-shadow:var(--shadow); overflow:clip}
+    .hero{position:relative; padding:28px; display:grid; gap:16px; min-height:460px;
+      background: radial-gradient(800px 300px at 100% 0%, rgba(34,197,94,.08), transparent 60%),
+                  radial-gradient(700px 260px at 0% 100%, rgba(59,130,246,.08), transparent 60%);
+    }
+    .hero h1{margin:0; font-size:28px; line-height:1.2; letter-spacing:.2px}
+    .hero p{margin:0; color:var(--muted)}
+    .stat{display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; padding:12px 14px; border-radius:12px;
+      background: color-mix(in oklab, var(--card), transparent 6%);
+      border:1px dashed color-mix(in oklab, var(--text), transparent 85%);
+    }
+    .stat .dot{width:10px; height:10px; border-radius:50%; background:var(--primary)}
+    .kpis{display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:auto}
+    .kpi{padding:14px; border-radius:12px; background: color-mix(in oklab, var(--card), transparent 6%);
+      border:1px solid color-mix(in oklab, var(--text), transparent 88%);
+    }
+    .kpi h3{margin:0 0 4px; font-size:13px; color:var(--muted)} .kpi .v{font-weight:700}
+    .form{padding:28px; display:grid; gap:18px}
+    .brand{display:flex; align-items:center; gap:10px}
+    .logo{width:36px; height:36px; display:grid; place-items:center; border-radius:10px;
+      background: linear-gradient(135deg, var(--primary), #2dd4bf); color:white; font-weight:700}
+    .brand h2{margin:0; font-size:20px}
+    .toggle{margin-inline-start:auto; display:inline-flex; align-items:center; gap:8px; font-size:13px; color:var(--muted)}
+    .switch{appearance:none; width:46px; height:26px; background:var(--input); border-radius:999px; position:relative; outline:none; cursor:pointer;
+      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+    }
+    .switch:before{content:""; position:absolute; inset:3px auto 3px 3px; width:20px; border-radius:999px; background:#fff; transition:transform .25s ease}
+    .switch:checked{background: color-mix(in oklab, var(--primary), black 15%)}
+    .switch:checked:before{transform: translateX(20px)}
+    .field{display:grid; gap:8px}
+    label{font-weight:600}
+    input[type="email"], input[type="password"], input[type="text"]{
+      background: var(--input); color: var(--text); border:1px solid color-mix(in oklab, var(--text), transparent 88%);
+      border-radius:12px; padding:12px 14px; outline: none;
+    }
+    input::placeholder{color: color-mix(in oklab, var(--text), transparent 55%)}
+    button.primary{background: var(--primary); color:#052e16; border:none; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer}
+    button.primary:hover{background: var(--primary-600)}
+    .hint{font-size:12px; color:var(--muted)}
+    .links{display:flex; gap:8px; flex-wrap:wrap}
+    .row{display:flex; gap:12px; align-items:center}
+    .row > *{flex:1}
+    .divider{height:1px; background: color-mix(in oklab, var(--text), transparent 90%)}
+    .lang{display:inline-flex; gap:6px; align-items:center}
   </style>
+  <!-- Firebase SDKs -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div class="app">
-    <section class="card hero" aria-label="حول النظام">
-      <h1>مرحباً بك في نظام تسجيل الدخول للمشاعل</h1>
-      <p>واجهة حديثة RTL، وضع داكن/فاتح، مصادقة، ورسائل فورية.</p>
-      <div class="stat" role="status" aria-live="polite">
-        <span class="dot" aria-hidden="true"></span>
-        <div>
-          <div><strong>الحالة:</strong> جاهز للاستخدام</div>
-          <small class="muted">يتم حفظ الجلسات محلياً لأغراض العرض</small>
-        </div>
-        <span>v1.0</span>
-      </div>
-      <div class="kpis" aria-label="مؤشرات">
-        <div class="kpi"><h3>محاولات اليوم</h3><div class="v" id="kpi-attempts">0</div></div>
-        <div class="kpi"><h3>المستخدمون</h3><div class="v">3</div></div>
-        <div class="kpi"><h3>مدة الجلسة</h3><div class="v" id="kpi-session">0:00</div></div>
+    <section class="card hero">
+      <h1 id="t-title">مرحبا بك في نظام المشاعل</h1>
+      <p id="t-sub">تسجيل دخول آمن مع Firebase ودعم وضع داكن مريح.</p>
+      <div class="kpis">
+        <div class="kpi"><h3 id="t-speed">السرعة</h3><div class="v">+99%</div></div>
+        <div class="kpi"><h3 id="t-security">الحماية</h3><div class="v">مُعززة</div></div>
+        <div class="kpi"><h3 id="t-ux">التجربة</h3><div class="v">سلسة</div></div>
       </div>
     </section>
-    <section class="card form" aria-label="نموذج الدخول">
+
+    <section class="card form">
       <div class="brand">
-        <div class="logo" aria-hidden="true">🔐</div>
-        <h2>تسجيل الدخول</h2>
-        <label class="toggle" title="التبديل بين الوضع الداكن والفاتح">
-          وضع داكن
-          <input id="themeSwitch" type="checkbox" class="switch" aria-label="تبديل الثيم">
-        </label>
-      </div>
-      <div id="alert" class="alert" role="alert" aria-live="assertive"></div>
-      <div class="field">
-        <label for="email">البريد الإلكتروني</label>
-        <input id="email" type="email" class="input" placeholder="name@example.com" autocomplete="username" required />
-      </div>
-      <div class="field">
-        <label for="password">كلمة المرور</label>
-        <input id="password" type="password" class="input" placeholder="••••••••" autocomplete="current-password" required />
-      </div>
-      <div class="row">
-        <label class="field" style="align-items:center; grid-template-columns: auto 1fr; gap: 10px">
-          <input id="remember" type="checkbox" />
-          <span>تذكرني</span>
-        </label>
-        <div class="links">
-          <a href="#" id="forgot">نسيت كلمة المرور؟</a>
-          <a href="#" id="signup">إنشاء حساب</a>
+        <div class="logo">A</div>
+        <h2 id="t-brand">نظام تسجيل الدخول</h2>
+        <div class="toggle">
+          <span class="lang"><span id="t-ar">عربي</span>/<span id="t-en">English</span></span>
+          <input id="langSwitch" class="switch" type="checkbox" aria-label="تبديل اللغة">
         </div>
       </div>
-      <div class="actions">
-        <button id="loginBtn" class="btn primary">تسجيل الدخول</button>
-        <button id="guestBtn" class="btn ghost">تصفح كزائر</button>
+
+      <div class="row">
+        <div class="field">
+          <label id="t-email-label" for="email">البريد الإلكتروني</label>
+          <input id="email" type="email" placeholder="example@mail.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label id="t-pass-label" for="password">كلمة المرور</label>
+          <input id="password" type="password" placeholder="********" autocomplete="current-password">
+        </div>
       </div>
-      <footer>© 2025 المشاعل - نظام دخول تعليمي</footer>
+
+      <button id="loginBtn" class="primary">تسجيل الدخول</button>
+      <div class="links">
+        <button id="googleBtn" class="primary" style="background:#3b82f6; color:#fff">Google</button>
+        <button id="logoutBtn" class="primary" style="background:#ef4444; color:#fff; display:none">تسجيل الخروج</button>
+      </div>
+
+      <div class="divider"></div>
+      <div class="hint" id="status">جاهز</div>
     </section>
   </div>
-  <div class="toast" id="toast" aria-live="polite" aria-atomic="false"></div>
+
   <script>
-    const users=[{email:'admin@example.com',password:'admin123',name:'المدير'},{email:'user@example.com',password:'user12345',name:'مستخدم'},{email:'support@example.com',password:'helpme123',name:'الدعم'}];
-    const email=document.getElementById('email');
-    const password=document.getElementById('password');
-    const remember=document.getElementById('remember');
-    const loginBtn=document.getElementById('loginBtn');
-    const guestBtn=document.getElementById('guestBtn');
-    const alertBox=document.getElementById('alert');
-    const kpiAttempts=document.getElementById('kpi-attempts');
-    const kpiSession=document.getElementById('kpi-session');
-    const toast=document.getElementById('toast');
-    const themeSwitch=document.getElementById('themeSwitch');
-    let attempts=Number(sessionStorage.getItem('attempts')||0);
-    let sessionStart=null;
-    function showToast(title,message,type='success',timeout=3000){const el=document.createElement('div');el.className=`item ${type}`;el.innerHTML=`<span aria-hidden="true">${type==='success'?'✅':type==='warning'?'⚠️':'⛔'}</span><div><div class="title">${title}</div><div class="msg">${message}</div></div><button class="close" aria-label="إغلاق">×</button>`;toast.appendChild(el);const close=()=>el.remove();el.querySelector('.close').addEventListener('click',close);setTimeout(close,timeout)}
-    function setAlert(type,message){alertBox.className=`alert ${type}`;alertBox.textContent=message;alertBox.style.display='block'}
-    function clearAlert(){alertBox.className='alert';alertBox.textContent='';alertBox.style.display='none'}
-    function updateKPIs(){kpiAttempts.textContent=String(attempts);if(sessionStart){const diff=Math.floor((Date.now()-sessionStart)/1000);const m=String(Math.floor(diff/60)).padStart(1,'0');const s=String(diff%60).padStart(2,'0');kpiSession.textContent=`${m}:${s}`}}
-    function authenticate(mail,pass){return users.find(u=>u.email===mail&&u.password===pass)}
-    function startSession(){sessionStart=Date.now();localStorage.setItem('sessionStart',String(sessionStart))}
-    function endSession(){sessionStart=null;localStorage.removeItem('sessionStart')}
-    function toggleTheme(){document.documentElement.style.colorScheme=themeSwitch.checked?'dark':'light'}
-    themeSwitch.addEventListener('change',toggleTheme);
-    function handleLogin(){clearAlert();const mail=email.value.trim();const pass=password.value;attempts++;sessionStorage.setItem('attempts',String(attempts));const user=authenticate(mail,pass);updateKPIs();if(!mail||!pass){setAlert('warning','يرجى إدخال البريد وكلمة المرور');showToast('تنبيه','الحقول مطلوبة','warning');return}if(user){showToast('تم الدخول',`مرحباً ${user.name}`,'success');setAlert('', '');clearAlert();startSession();if(remember.checked){localStorage.setItem('authUser',JSON.stringify({email:user.email,name:user.name}))}else{localStorage.removeItem('authUser')}}else{setAlert('danger','بيانات الدخول غير صحيحة');showToast('خطأ','تحقق من البريد أو كلمة المرور','danger')}}
-    function handleGuest(){showToast('وضع الزائر','تم الدخول كزائر','success')}
-    function forgot(){showToast('استرجاع كلمة المرور','سيتم إرسال رابط عند التفعيل','warning')}
-    function signup(){showToast('إنشاء حساب','سيتم فتح نموذج التسجيل قريباً','warning')}
-    loginBtn.addEventListener('click',handleLogin);
-    guestBtn.addEventListener('click',handleGuest);
-    document.getElementById('forgot').addEventListener('click',e=>{e.preventDefault();forgot()});
-    document.getElementById('signup').addEventListener('click',e=>{e.preventDefault();signup()});
-    const savedSession=localStorage.getItem('sessionStart');if(savedSession){sessionStart=Number(savedSession)||Date.now()}
-    setInterval(updateKPIs,1000);updateKPIs();
+    // Language strings
+    const STR = {
+      ar: {
+        title: "مرحبا بك في نظام المشاعل",
+        sub: "تسجيل دخول آمن مع Firebase ودعم وضع داكن مريح.",
+        brand: "نظام تسجيل الدخول",
+        email: "البريد الإلكتروني",
+        pass: "كلمة المرور",
+        speed: "السرعة",
+        security: "الحماية",
+        ux: "التجربة",
+        login: "تسجيل الدخول",
+        logout: "تسجيل الخروج",
+        ready: "جاهز"
+      },
+      en: {
+        title: "Welcome to Al-Mashael System",
+        sub: "Secure login with Firebase and eye-friendly dark mode.",
+        brand: "Login System",
+        email: "Email",
+        pass: "Password",
+        speed: "Speed",
+        security: "Security",
+        ux: "Experience",
+        login: "Log in",
+        logout: "Log out",
+        ready: "Ready"
+      }
+    };
+
+    const $ = s => document.querySelector(s);
+    const langSwitch = $('#langSwitch');
+    let lang = localStorage.getItem('lang') || 'ar';
+
+    function applyLang() {
+      const t = STR[lang];
+      $('#t-title').textContent = t.title;
+      $('#t-sub').textContent = t.sub;
+      $('#t-brand').textContent = t.brand;
+      $('#t-email-label').textContent = t.email;
+      $('#t-pass-label').textContent = t.pass;
+      $('#t-speed').textContent = t.speed;
+      $('#t-security').textContent = t.security;
+      $('#t-ux').textContent = t.ux;
+      $('#loginBtn').textContent = t.login;
+      $('#logoutBtn').textContent = t.logout;
+      $('#status').textContent = t.ready;
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      langSwitch.checked = (lang === 'en');
+    }
+
+    langSwitch.addEventListener('change', () => {
+      lang = langSwitch.checked ? 'en' : 'ar';
+      localStorage.setItem('lang', lang);
+      applyLang();
+    });
+
+    applyLang();
+
+    // Firebase init (Replace with your config)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    function safeInit() {
+      try {
+        if (firebase?.apps?.length === 0) firebase.initializeApp(firebaseConfig);
+      } catch(e) { console.warn('Firebase init skipped', e); }
+    }
+
+    function setStatus(msg){ $('#status').textContent = msg; }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      safeInit();
+      const auth = firebase?.auth?.();
+
+      $('#loginBtn').addEventListener('click', async () => {
+        const email = $('#email').value.trim();
+        const pass = $('#password').value;
+        if(!email || !pass) return setStatus(lang==='ar' ? 'الرجاء إدخال البيانات' : 'Please enter credentials');
+        try {
+          if(!auth) throw new Error('Auth not ready');
+          await auth.signInWithEmailAndPassword(email, pass);
+          setStatus(lang==='ar' ? 'تم تسجيل الدخول' : 'Logged in');
+          $('#logoutBtn').style.display = '';
+        } catch(err){
+          console.error(err);
+          setStatus((lang==='ar'? 'خطأ: ' : 'Error: ') + (err.message||''));
+        }
+      });
+
+      $('#googleBtn').addEventListener('click', async () => {
+        try{
+          if(!auth) throw new Error('Auth not ready');
+          const provider = new firebase.auth.GoogleAuthProvider();
+          await auth.signInWithPopup(provider);
+          setStatus(lang==='ar' ? 'تم تسجيل الدخول عبر Google' : 'Signed in with Google');
+          $('#logoutBtn').style.display = '';
+        }catch(err){
+          console.error(err);
+          setStatus((lang==='ar'? 'خطأ: ' : 'Error: ') + (err.message||''));
+        }
+      });
+
+      $('#logoutBtn').addEventListener('click', async () => {
+        try{
+          if(!auth) throw new Error('Auth not ready');
+          await auth.signOut();
+          setStatus(lang==='ar' ? 'تم تسجيل الخروج' : 'Logged out');
+          $('#logoutBtn').style.display = 'none';
+        }catch(err){
+          console.error(err);
+          setStatus((lang==='ar'? 'خطأ: ' : 'Error: ') + (err.message||''));
+        }
+      });
+    });
   </script>
 </body>
 </html>
