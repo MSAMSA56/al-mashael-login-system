@@ -1,217 +1,217 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>نظام تسجيل الدخول - المشاعل</title>
-  <meta name="color-scheme" content="light dark"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg: #0b1220; --card: #111a2b; --muted:#94a3b8; --text:#e2e8f0;
-      --primary:#22c55e; --primary-600:#16a34a; --danger:#ef4444; --warning:#f59e0b;
-      --ring: rgba(34,197,94,.35); --input:#1f2a44; --shadow: 0 20px 45px rgba(2,6,23,.35);
-    }
-    [data-theme="light"] {
-      --bg:#f6f7fb; --card:#fff; --muted:#475569; --text:#0f172a;
-      --primary:#16a34a; --primary-600:#15803d; --danger:#dc2626; --warning:#d97706;
-      --ring: rgba(22,163,74,.25); --input:#f1f5f9; --shadow: 0 18px 36px rgba(15,23,42,.12);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:"Cairo", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 500px at 90% -10%, rgba(34,197,94,.08), transparent 60%),
-                  radial-gradient(900px 500px at -10% 110%, rgba(59,130,246,.08), transparent 60%),
-                  var(--bg);
-      color: var(--text);
-      display:grid; place-items:center; padding:24px;
-    }
-    .app{width:100%; max-width:980px; display:grid; gap:24px; grid-template-columns:1.1fr 1fr; align-items:stretch}
-    @media (max-width: 860px){.app{grid-template-columns:1fr; padding-inline:8px}}
-    .card{background: linear-gradient(180deg, color-mix(in oklab, var(--card), transparent 8%), var(--card));
-      border:1px solid color-mix(in oklab, var(--text), transparent 88%); border-radius:16px; box-shadow:var(--shadow); overflow:clip}
-    .hero{position:relative; padding:28px; display:grid; gap:16px; min-height:460px}
-    h1{margin:0; font-size:28px}
-    .grid{display:grid; gap:12px}
-    .row{display:grid; gap:8px}
-    .label{font-size:14px; color:var(--muted)}
-    .input{appearance:none; background:var(--input); color:var(--text); border:1px solid transparent; border-radius:12px; padding:12px 14px; outline:none; transition:.2s}
-    .input:focus{box-shadow:0 0 0 6px var(--ring); border-color:var(--primary)}
-    .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 14px; border-radius:12px; border:1px solid transparent; cursor:pointer; transition:.2s; font-weight:600}
-    .btn.primary{background:var(--primary); color:white}
-    .btn.primary:hover{background:var(--primary-600)}
-    .btn.ghost{background:transparent; color:var(--text); border-color:color-mix(in oklab, var(--text), transparent 84%)}
-    .btn.danger{background:var(--danger); color:#fff}
-    .row.actions{display:flex; gap:10px; flex-wrap:wrap}
-    .hint{font-size:13px; color:var(--muted)}
-    .list{margin:0; padding:0; list-style:none; display:grid; gap:8px; font-size:14px}
-    .success{color:#16a34a}
-    .error{color:#ef4444}
-    code.small{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px}
-  </style>
-</head>
-<body>
-  <div class="app">
-    <section class="card hero">
-      <h1>تسجيل الدخول إلى نظام المشاعل</h1>
-      <p class="hint">تسجيل، تسجيل دخول، إعادة تعيين كلمة المرور. يتم حفظ بيانات المستخدم في Firestore.</p>
-
-      <div class="grid" id="auth-views">
-        <!-- Login -->
-        <div id="view-login">
-          <div class="row">
-            <label class="label" for="login-email">البريد الإلكتروني</label>
-            <input class="input" id="login-email" placeholder="name@example.com" type="email"/>
-          </div>
-          <div class="row">
-            <label class="label" for="login-pass">كلمة المرور</label>
-            <input class="input" id="login-pass" placeholder="••••••••" type="password"/>
-          </div>
-          <div class="row actions">
-            <button class="btn primary" id="btn-login">تسجيل الدخول</button>
-            <button class="btn ghost" id="to-register">إنشاء حساب</button>
-            <button class="btn ghost" id="to-reset">نسيت كلمة المرور؟</button>
-          </div>
-        </div>
-
-        <!-- Register -->
-        <div id="view-register" style="display:none">
-          <div class="row">
-            <label class="label" for="reg-name">الاسم الكامل</label>
-            <input class="input" id="reg-name" placeholder="الاسم" type="text"/>
-          </div>
-          <div class="row">
-            <label class="label" for="reg-email">البريد الإلكتروني</label>
-            <input class="input" id="reg-email" placeholder="name@example.com" type="email"/>
-          </div>
-          <div class="row">
-            <label class="label" for="reg-pass">كلمة المرور</label>
-            <input class="input" id="reg-pass" placeholder="••••••••" type="password"/>
-          </div>
-          <div class="row actions">
-            <button class="btn primary" id="btn-register">إنشاء الحساب</button>
-            <button class="btn ghost" id="to-login-1">لدي حساب</button>
-          </div>
-        </div>
-
-        <!-- Reset -->
-        <div id="view-reset" style="display:none">
-          <div class="row">
-            <label class="label" for="reset-email">أدخل بريدك لإرسال رابط الاستعادة</label>
-            <input class="input" id="reset-email" placeholder="name@example.com" type="email"/>
-          </div>
-          <div class="row actions">
-            <button class="btn primary" id="btn-reset">إرسال رابط الاستعادة</button>
-            <button class="btn ghost" id="to-login-2">رجوع لتسجيل الدخول</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="hint" id="status"></div>
-      <ul class="list" id="profile" style="display:none"></ul>
-    </section>
-  </div>
-
-  <!-- Firebase SDKs -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-
-    // ثبّت الإعدادات لقاعدة بيانات حقيقية Firebase
-    const firebaseConfig = {
-      apiKey: 'AIzaSyCD-lB-RPKHxDeHrs4243rkqpkQ36ZSUHg',
-      authDomain: 'al-mashael-school-system.firebaseapp.com',
-      projectId: 'al-mashael-school-system',
-      storageBucket: 'al-mashael-school-system.firebasestorage.app',
-      messagingSenderId: '387864421863',
-      appId: '1:387864421863:web:ef761039351de11ab2c942'
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const $ = (id)=>document.getElementById(id);
-    const show = (id)=>{ ['view-login','view-register','view-reset'].forEach(v=>document.getElementById(v).style.display='none'); document.getElementById(id).style.display='grid'; };
-    const setStatus = (msg, type='')=>{ const el=$('status'); el.textContent=msg; el.className = 'hint ' + (type||''); };
-
-    // رقم مدير النظام لواتساب
-    const ADMIN_WHATSAPP = '+201234567890'; // عدِّله للرقم الفعلي بصيغة دولية
-    const openWhatsApp = (text)=>{
-      const url = `https://wa.me/${ADMIN_WHATSAPP.replace(/[^\d]/g,'')}?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
-    };
-
-    // Handlers
-    $('to-register').onclick = ()=> {
-      openWhatsApp('طلب إنشاء حساب جديد');
-      show('view-register');
-    };
-    $('to-login-1').onclick = ()=> show('view-login');
-    $('to-login-2').onclick = ()=> show('view-login');
-    $('to-reset').onclick = ()=> {
-      openWhatsApp('طلب استرجاع كلمة المرور');
-      show('view-reset');
-    };
-
-    $('btn-login').onclick = async ()=>{
-      const email = $('login-email').value.trim();
-      const pass = $('login-pass').value;
-      if(!email || !pass) return setStatus('الرجاء إدخال البريد وكلمة المرور', 'error');
-      try{
-        await signInWithEmailAndPassword(auth, email, pass);
-        setStatus('تم تسجيل الدخول بنجاح', 'success');
-      }catch(e){ setStatus(e.message, 'error'); }
-    };
-
-    $('btn-register').onclick = async ()=>{
-      const name = $('reg-name').value.trim();
-      const email = $('reg-email').value.trim();
-      const pass = $('reg-pass').value;
-      if(!name || !email || !pass) return setStatus('يرجى تعبئة كل الحقول', 'error');
-      try{
-        const cred = await createUserWithEmailAndPassword(auth, email, pass);
-        if(name){ await updateProfile(cred.user, { displayName: name }); }
-        const ref = doc(db, 'users', cred.user.uid);
-        await setDoc(ref, { uid: cred.user.uid, name, email, createdAt: serverTimestamp() }, { merge: true });
-        setStatus('تم إنشاء الحساب وتخزين البيانات', 'success');
-        show('view-login');
-      }catch(e){ setStatus(e.message, 'error'); }
-    };
-
-    $('btn-reset').onclick = async ()=>{
-      const email = $('reset-email').value.trim();
-      if(!email) return setStatus('الرجاء إدخال البريد', 'error');
-      try{
-        await sendPasswordResetEmail(auth, email);
-        setStatus('تم إرسال رابط الاستعادة إلى بريدك', 'success');
-        show('view-login');
-      }catch(e){ setStatus(e.message, 'error'); }
-    };
-
-    onAuthStateChanged(auth, async (user)=>{
-      const profile = document.getElementById('profile');
-      if(user){
-        const ref = doc(db, 'users', user.uid);
-        const snap = await getDoc(ref);
-        const data = snap.exists()? snap.data() : { email: user.email, name: user.displayName };
-        profile.style.display = 'grid';
-        profile.innerHTML = `
-          <li><strong>المعرف:</strong> <code class="small">${user.uid}</code></li>
-          <li><strong>الاسم:</strong> ${data.name||''}</li>
-          <li><strong>البريد:</strong> ${data.email||''}</li>
-          <li><button class="btn danger" id="btn-logout">تسجيل الخروج</button></li>
-        `;
-        document.getElementById('btn-logout').onclick = ()=> signOut(auth);
-      } else {
-        profile.style.display = 'none';
-        profile.innerHTML = '';
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>نظام تسجيل الدخول - المشاعل</title>
+    <meta name="color-scheme" content="light dark" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #0b1220; --card: #111a2b; --muted:#94a3b8; --text:#e2e8f0;
+        --primary:#22c55e; --primary-600:#16a34a; --danger:#ef4444; --warning:#f59e0b;
+        --ring: rgba(34,197,94,.35); --input:#1f2a44; --shadow: 0 20px 45px rgba(2,6,23,.35);
       }
-    });
-  </script>
-</body>
+      [data-theme="light"] {
+        --bg:#f6f7fb; --card:#fff; --muted:#475569; --text:#0f172a;
+        --primary:#16a34a; --primary-600:#15803d; --danger:#dc2626; --warning:#d97706;
+        --ring: rgba(22,163,74,.25); --input:#f1f5f9; --shadow: 0 18px 36px rgba(15,23,42,.12);
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; font-family:"Cairo", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: radial-gradient(1200px 500px at 90% -10%, rgba(34,197,94,.08), transparent 60%),
+                    radial-gradient(900px 500px at -10% 110%, rgba(59,130,246,.08), transparent 60%),
+                    var(--bg);
+        color: var(--text);
+        display:grid; place-items:center; padding:24px;
+      }
+      .app{width:100%; max-width:1100px; display:grid; gap:24px; grid-template-columns:1.1fr 1fr; align-items:stretch; padding-inline:8px}
+      @media (max-width: 1024px){.app{max-width:920px}}
+      @media (max-width: 860px){.app{grid-template-columns:1fr}}
+      @media (max-width: 480px){body{padding:12px}}
+      .card{background: linear-gradient(180deg, color-mix(in oklab, var(--card), transparent 8%), var(--card));
+        border:1px solid color-mix(in oklab, var(--text), transparent 88%); border-radius:16px; box-shadow:var(--shadow); overflow:clip}
+      .hero{position:relative; padding:28px; display:grid; gap:16px; min-height:460px}
+      h1{margin:0; font-size:28px}
+      @media (max-width:480px){h1{font-size:22px}}
+      .grid{display:grid; gap:12px}
+      .row{display:grid; gap:8px}
+      .label{font-size:14px; color:var(--muted)}
+      .input{appearance:none; background:var(--input); color:var(--text); border:1px solid transparent; border-radius:12px; padding:12px 14px; outline:none; transition:.2s; width:100%}
+      .input:focus{box-shadow:0 0 0 6px var(--ring); border-color:var(--primary)}
+      .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 14px; border-radius:12px; border:1px solid transparent; cursor:pointer; transition:.2s; font-weight:600}
+      .btn.primary{background:var(--primary); color:white}
+      .btn.primary:hover{background:var(--primary-600)}
+      .btn.ghost{background:transparent; color:var(--text); border-color:color-mix(in oklab, var(--text), transparent 84%)}
+      .btn.danger{background:var(--danger); color:#fff}
+      .row.actions{display:flex; gap:10px; flex-wrap:wrap}
+      .hint{font-size:13px; color:var(--muted)}
+      .list{margin:0; padding:0; list-style:none; display:grid; gap:8px; font-size:14px}
+      .success{color:#16a34a}
+      .error{color:#ef4444}
+      code.small{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px}
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <section class="card hero">
+        <h1>تسجيل الدخول إلى نظام المشاعل</h1>
+        <p class="hint">تسجيل، تسجيل دخول، إعادة تعيين كلمة المرور. يتم حفظ بيانات المستخدم في Firestore.</p>
+        <div class="grid" id="auth-views">
+          <!-- Login -->
+          <div id="view-login">
+            <div class="row">
+              <label class="label" for="login-email">البريد الإلكتروني</label>
+              <input class="input" id="login-email" placeholder="name@example.com" type="email" />
+            </div>
+            <div class="row">
+              <label class="label" for="login-pass">كلمة المرور</label>
+              <input class="input" id="login-pass" placeholder="••••••••" type="password" />
+            </div>
+            <div class="row actions">
+              <button class="btn primary" id="btn-login">تسجيل الدخول</button>
+              <button class="btn ghost" id="to-register">إنشاء حساب</button>
+              <button class="btn ghost" id="to-reset">نسيت كلمة المرور؟</button>
+            </div>
+          </div>
+          <!-- Register -->
+          <div id="view-register" style="display:none">
+            <div class="row">
+              <label class="label" for="reg-name">الاسم الكامل</label>
+              <input class="input" id="reg-name" placeholder="الاسم" type="text" />
+            </div>
+            <div class="row">
+              <label class="label" for="reg-email">البريد الإلكتروني</label>
+              <input class="input" id="reg-email" placeholder="name@example.com" type="email" />
+            </div>
+            <div class="row">
+              <label class="label" for="reg-pass">كلمة المرور</label>
+              <input class="input" id="reg-pass" placeholder="••••••••" type="password" />
+            </div>
+            <div class="row actions">
+              <button class="btn primary" id="btn-register">إنشاء الحساب</button>
+              <button class="btn ghost" id="to-login-1">لدي حساب</button>
+            </div>
+          </div>
+          <!-- Reset -->
+          <div id="view-reset" style="display:none">
+            <div class="row">
+              <label class="label" for="reset-email">أدخل بريدك لإرسال رابط الاستعادة</label>
+              <input class="input" id="reset-email" placeholder="name@example.com" type="email" />
+            </div>
+            <div class="row actions">
+              <button class="btn primary" id="btn-reset">إرسال رابط الاستعادة</button>
+              <button class="btn ghost" id="to-login-2">رجوع لتسجيل الدخول</button>
+            </div>
+          </div>
+        </div>
+        <div class="hint" id="status"></div>
+        <ul class="list" id="profile" style="display:none"></ul>
+      </section>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+      import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+      import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: 'AIzaSyCD-lB-RPKHxDeHrs4243rkqpkQ36ZSUHg',
+        authDomain: 'al-mashael-school-system.firebaseapp.com',
+        projectId: 'al-mashael-school-system',
+        storageBucket: 'al-mashael-school-system.firebasestorage.app',
+        messagingSenderId: '387864421863',
+        appId: '1:387864421863:web:ef761039351de11ab2c942'
+      };
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const $ = (id)=>document.getElementById(id);
+      const show = (id)=>{ ['view-login','view-register','view-reset'].forEach(v=>document.getElementById(v).style.display='none'); document.getElementById(id).style.display='grid'; };
+      const setStatus = (msg, type='')=>{ const el=$('status'); el.textContent=msg; el.className = 'hint ' + (type||''); };
+
+      // رقم واتساب الرسمي لطلبات الحساب والاسترجاع
+      const ADMIN_WHATSAPP = '0566079856'; // سيتم تحويله تلقائياً لصيغة دولية عند الإرسال
+      const normalizePhone = (n)=> n.replace(/[^\d]/g,'');
+      const openWhatsApp = (text)=>{
+        const local = normalizePhone(ADMIN_WHATSAPP);
+        // إذا كان الرقم محلياً في السعودية (يبدأ بـ 05) نحوله إلى 9665..
+        const intl = local.startsWith('0') ? '966' + local.slice(1) : local;
+        const url = `https://wa.me/${intl}?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+      };
+
+      // Handlers
+      $('to-register').onclick = ()=> {
+        openWhatsApp('طلب إنشاء حساب جديد لنظام المشاعل');
+        show('view-register');
+      };
+      $('to-login-1').onclick = ()=> show('view-login');
+      $('to-login-2').onclick = ()=> show('view-login');
+      $('to-reset').onclick = ()=> {
+        openWhatsApp('طلب استرجاع/إعادة تعيين كلمة المرور لنظام المشاعل');
+        show('view-reset');
+      };
+
+      $('btn-login').onclick = async ()=>{
+        const email = $('login-email').value.trim();
+        const pass = $('login-pass').value;
+        if(!email || !pass) return setStatus('الرجاء إدخال البريد وكلمة المرور', 'error');
+        try{
+          await signInWithEmailAndPassword(auth, email, pass);
+          setStatus('تم تسجيل الدخول بنجاح', 'success');
+        }catch(e){ setStatus(e.message, 'error'); }
+      };
+
+      $('btn-register').onclick = async ()=>{
+        const name = $('reg-name').value.trim();
+        const email = $('reg-email').value.trim();
+        const pass = $('reg-pass').value;
+        if(!name || !email || !pass) return setStatus('يرجى تعبئة كل الحقول', 'error');
+        try{
+          const cred = await createUserWithEmailAndPassword(auth, email, pass);
+          if(name){ await updateProfile(cred.user, { displayName: name }); }
+          const ref = doc(db, 'users', cred.user.uid);
+          await setDoc(ref, { uid: cred.user.uid, name, email, createdAt: serverTimestamp() }, { merge: true });
+          setStatus('تم إنشاء الحساب وتخزين البيانات', 'success');
+          show('view-login');
+        }catch(e){ setStatus(e.message, 'error'); }
+      };
+
+      $('btn-reset').onclick = async ()=>{
+        const email = $('reset-email').value.trim();
+        if(!email) return setStatus('الرجاء إدخال البريد', 'error');
+        try{
+          await sendPasswordResetEmail(auth, email);
+          setStatus('تم إرسال رابط الاستعادة إلى بريدك', 'success');
+          show('view-login');
+        }catch(e){ setStatus(e.message, 'error'); }
+      };
+
+      onAuthStateChanged(auth, async (user)=>{
+        const profile = document.getElementById('profile');
+        if(user){
+          const ref = doc(db, 'users', user.uid);
+          const snap = await getDoc(ref);
+          const data = snap.exists()? snap.data() : { email: user.email, name: user.displayName };
+          profile.style.display = 'grid';
+          profile.innerHTML = `
+            <li><strong>المعرف:</strong> <code class="small">${user.uid}</code></li>
+            <li><strong>الاسم:</strong> ${data.name||''}</li>
+            <li><strong>البريد:</strong> ${data.email||''}</li>
+            <li><button class="btn danger" id="btn-logout">تسجيل الخروج</button></li>
+          `;
+          document.getElementById('btn-logout').onclick = ()=> signOut(auth);
+        } else {
+          profile.style.display = 'none';
+          profile.innerHTML = '';
+        }
+      });
+    </script>
+  </body>
 </html>
