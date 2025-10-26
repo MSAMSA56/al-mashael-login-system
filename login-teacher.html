@@ -52,6 +52,9 @@
     .back-link{text-align:center; margin-top:16px}
     .back-link a{color:var(--muted); text-decoration:none; font-size:14px}
     .back-link a:hover{color:var(--primary)}
+    .language-switch {
+      text-align:center; margin-bottom:12px;
+    }
   </style>
 </head>
 <body>
@@ -62,7 +65,10 @@
         <h1>مرحباً بك</h1>
         <p class="subtitle">سجل دخولك للوصول إلى لوحة المعلمين</p>
       </div>
-      
+      <div class="language-switch">
+        <button class="btn ghost" id="btn-toggle-lang">English</button>
+        <button class="btn ghost" id="btn-toggle-theme">🌙/☀️</button>
+      </div>
       <div class="grid">
         <div class="row">
           <label class="label" for="email">البريد الإلكتروني</label>
@@ -73,21 +79,18 @@
           <input class="input" id="password" placeholder="••••••••" type="password"/>
         </div>
         <button class="btn primary" id="btn-login">تسجيل الدخول</button>
+        <button class="btn ghost" id="btn-forgot" type="button">نسيت كلمة المرور؟</button>
       </div>
-      
       <div class="hint" id="status"></div>
-      
       <div class="back-link">
         <a href="index.html">← العودة لاختيار الدور</a>
       </div>
     </div>
   </div>
-  
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-    
     const firebaseConfig = {
       apiKey: 'AIzaSyCD-lB-RPKHxDeHrs4243rkqpkQ36ZSUHg',
       authDomain: 'al-mashael-school-system.firebaseapp.com',
@@ -96,57 +99,56 @@
       messagingSenderId: '387864421863',
       appId: '1:387864421863:web:ef761039351de11ab2c942'
     };
-    
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    
     const $ = (id) => document.getElementById(id);
     const setStatus = (msg, type='') => {
       const el = $('status');
       el.textContent = msg;
       el.className = 'hint ' + (type || '');
     };
-    
+    // تغيير الوضع الليلي/الفاتح
+    $('btn-toggle-theme').onclick = () => {
+      const current = document.body.getAttribute('data-theme') || '';
+      document.body.setAttribute('data-theme', current === 'light' ? '' : 'light');
+    };
+    // تبديل اللغة (واجهة أولية فقط)
+    $('btn-toggle-lang').onclick = () => {
+      alert('سيتم دعم الواجهة الإنجليزية قريبًا');
+    };
     $('btn-login').onclick = async () => {
       const email = $('email').value.trim();
       const password = $('password').value;
-      
-      if (!email || !password) {
-        return setStatus('الرجاء إدخال البريد وكلمة المرور', 'error');
-      }
-      
+      setStatus('');
+      if (!email || !password) return setStatus('الرجاء إدخال البريد وكلمة المرور', 'error');
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        
-        // Check if user is a teacher in teachers collection
+        // تحقق أن دوره teacher
         const teacherRef = doc(db, 'teachers', user.uid);
         const teacherSnap = await getDoc(teacherRef);
-        
         if (teacherSnap.exists()) {
           setStatus('تم تسجيل الدخول بنجاح!', 'success');
-          setTimeout(() => {
-            window.location.href = 'dashboard-teacher.html';
-          }, 1000);
+          setTimeout(() => window.location.href='dashboard-teacher.html', 800);
         } else {
-          await auth.signOut();
-          setStatus('هذا الحساب ليس حساب معلم', 'error');
+          await signOut(auth);
+          setStatus('هذا الحساب ليس حساب معلم.', 'error');
         }
       } catch (error) {
         setStatus('خطأ في تسجيل الدخول: ' + error.message, 'error');
       }
     };
-    
-    // Check if already logged in
+    // زر نسيت كلمة المرور → يفتح واتساب
+    $('btn-forgot').onclick = () => {
+      const email = $('email').value.trim();
+      if (!email) return setStatus('يرجى إدخال بريدك أولاً ثم الضغط على نسيت كلمة المرور', 'error');
+      const msg = encodeURIComponent(`طلب استعادة كلمة المرور لحساب معلم 👨‍🏫\nالبريد: ${email}\nيرجى المتابعة وتفعيل الحساب.`);
+      window.open(`https://wa.me/966566079856?text=${msg}`, '_blank');
+    };
+    // منع الدخول التلقائي للجلسات القديمة بدون تحقق صريح لكل دخول
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const teacherRef = doc(db, 'teachers', user.uid);
-        const teacherSnap = await getDoc(teacherRef);
-        if (teacherSnap.exists()) {
-          window.location.href = 'dashboard-teacher.html';
-        }
-      }
+      if (!user) return; //عدم التوجيه التلقائي لأي جلسة
     });
   </script>
 </body>
